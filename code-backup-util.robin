@@ -1,0 +1,41 @@
+/# Code Backup Utility - Version 1.0
+
+This script is provided AS IS, WITHOUT ANY WARRANTY. Always be careful over which scripts you run. Scripts like these, when modified by bad guys, can cause system breaks, loss of information, or both#/
+LOOP LoopIndex FROM 0 TO 65535 STEP 1
+    WAIT (System.WaitForProcess.ProcessToStart ProcessName: $'''Ping''')
+    # Please replace the value of "SourceFolder" to be your source folder. All references of drive I:\ also need to be replaced with your target directory
+    SET SourceFolder TO $'''C:\\dev\\'''
+    IF (Folder.IfFolderExists.Exists Path: $'''I:\\''') THEN
+        Display.InputDialog Title: $'''Code Backup Utility''' Message: $'''Which project should be backed up?''' InputType: Display.InputType.SingleLine IsTopMost: False UserInput=> UserInput ButtonPressed=> ButtonPressed
+        IF ButtonPressed = $'''OK''' THEN
+            SET SourceFolder TO $'''C:\\dev\\%UserInput%'''
+            IF (Folder.IfFolderExists.Exists Path: SourceFolder) THEN
+                IF (Folder.IfFolderExists.DoesNotExist Path: $'''I:\\%UserInput%''') THEN
+                    Folder.Create FolderPath: $'''I:\\''' FolderName: UserInput Folder=> NewFolder2
+                END
+                DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+                Text.Replace Text: CurrentDateTime TextToFind: $'''/''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''-''' ActivateEscapeSequences: False Result=> Replaced
+                Text.Replace Text: Replaced TextToFind: $''':''' IsRegEx: False IgnoreCase: False ReplaceWith: $'''-''' ActivateEscapeSequences: False Result=> NewDate
+                SET FolderName TO $'''%UserInput% (%NewDate%)'''
+                Folder.Create FolderPath: $'''I:\\%UserInput%''' FolderName: FolderName Folder=> NewFolder
+                Folder.Copy Folder: SourceFolder Destination: $'''I:\\%UserInput%\\%FolderName%''' IfFolderExists: Folder.IfExists.Overwrite CopiedFolder=> CopiedFolder
+                Folder.Rename Folder: CopiedFolder.FullName NewName: $'''I:\\%UserInput%\\%FolderName%''' RenamedFolder=> RenamedFolder
+                IF (Folder.IfFolderExists.Exists Path: $'''%CopiedFolder%\\.git''') THEN
+                    Display.ShowMessageDialog.ShowMessage Title: $'''Code Backup Utility''' Message: $'''A Git directory has been detected in \"%CopiedFolder%\". This may cause unwanted changes when you revert code files with ones from this folder. Do you want to delete it?''' Icon: Display.Icon.Question Buttons: Display.Buttons.YesNo DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed2
+                    IF ButtonPressed2 = $'''Yes''' THEN
+                        Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''rd \"%CopiedFolder%\\.git\" /s /q''' StandardOutput=> CommandOutput StandardError=> CommandErrorOutput ExitCode=> CommandExitCode
+                    END
+                END
+                IF (Folder.IfFolderExists.Exists Path: $'''%CopiedFolder%\\.vs''') THEN
+                    Display.ShowMessageDialog.ShowMessage Title: $'''Code Backup Utility''' Message: $'''A Visual Studio directory has been detected in %CopiedFolder%. Do you want to delete it?''' Icon: Display.Icon.Question Buttons: Display.Buttons.YesNo DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed5
+                    IF ButtonPressed5 = $'''Yes''' THEN
+                        Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''rd \"%CopiedFolder%\\.vs\" /s /q''' StandardOutput=> CommandOutput2 StandardError=> CommandErrorOutput2 ExitCode=> CommandExitCode2
+                    END
+                END
+                Display.ShowMessageDialog.ShowMessage Title: $'''Code Backup Utility''' Message: $'''Code from project \"%UserInput%\" exported to folder \"%CopiedFolder%\"''' Icon: Display.Icon.Information Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed4
+            ELSE
+                Display.ShowMessageDialog.ShowMessage Title: $'''Code Backup Utility''' Message: $'''The project \"%UserInput%\" isn\'t located in the C:\\dev directory''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: False ButtonPressed=> ButtonPressed3
+            END
+        END
+    END
+END
