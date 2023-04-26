@@ -42,4 +42,49 @@ These features will be added to Code Backup Utility:
 <p align="center">
   <img src="https://user-images.githubusercontent.com/101426328/234381124-0bd9eb5f-eff3-4857-b593-45665ef0097f.gif">
 </p>
-6. Save the new flow and click the Play button in the flow list
+
+6. **IMPORTANT**: replace all values of `SourceFolder` from `C:\dev` (a sample development folder) to the folder you store the projects on. Also replace all references of `I:\` to the target directory of your choosing
+7. Save the new flow and click the Play button in the flow list
+
+## Scheduling the task
+Power Automate doesn't support scheduling desktop flows, so we have to improvise a little bit with Task Scheduler:
+
+1. Open Task Scheduler or press `Win + R` and type `taskschd.msc`
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/101426328/234676547-dbc69ed9-b04c-4136-bf3b-79f2d83d3f26.png">
+</p>
+
+2. Right-click an empty area of the task list, and click "New basic task..."
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/101426328/234677123-8ff24a6d-6b58-4c32-bdb5-8de77579db4b.png">
+</p>
+
+3. Provide a name and a description (the latter is optional)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/101426328/234677533-da8fb7b0-c5f8-4412-89b2-d66e622982b1.png">
+</p>
+
+4. Specify when should the task be triggered. It is recommended to keep the default value, and to trigger the task at 9 PM
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/101426328/234678141-c32b2378-39bc-4da3-aed5-a8ea361f7bb1.png">
+</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/101426328/234678523-877ae36d-3af3-46b2-b7bd-3ff8a2b29724.png">
+</p>
+
+  > If your time zone is affected by daylight savings, tick the "Sync time zones" check box
+  
+5. Tell the wizard to start a program (it is the default value), and specify the following settings in the next page:
+
+    - Program or script: `ping`
+    - Arguments: `localhost`
+    - Start in: (nothing)
+    
+  > The flow waits for the `ping` process. The combination doesn't ping external servers, but only your host system (`localhost`, `127.0.0.1`)
+  
+6. In the Summary screen, click "Finish"
+
+The disadvantage of this is that, when the task is triggered, a CMD window will show. This is the `ping` command running. If you know of a better way of running the task without showing anything, please let me know.
+
+## How do I contribute?
+You'll need to follow the steps in the "How do I begin?" section first. Then, make your fixes, select ALL blocks and copy it to a text editor. Save the contents to `code-backup-util.robin` and replace the contents of the old file in the repository. That's it!
