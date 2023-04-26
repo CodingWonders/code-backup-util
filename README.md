@@ -43,7 +43,7 @@ These features will be added to Code Backup Utility:
   <img src="https://user-images.githubusercontent.com/101426328/234381124-0bd9eb5f-eff3-4857-b593-45665ef0097f.gif">
 </p>
 
-6. **IMPORTANT**: replace all values of `SourceFolder` from `C:\dev` (a sample development folder) to the folder you store the projects on. Also replace all references of `I:\` to the target directory of your choosing
+6. **IMPORTANT**: replace all values of `SourceFolder` from `C:\dev` (a sample development folder) with the folder you store the projects on. Also replace all references of `I:\` with the target directory of your choosing
 7. Save the new flow and click the Play button in the flow list
 
 ## Scheduling the task
